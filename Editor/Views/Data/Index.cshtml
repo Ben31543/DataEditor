@@ -1,0 +1,12 @@
+﻿@model List<Models.TableModel>
+
+<div class="text-center">
+    <h1>Tables of your SQL Database</h1>
+    @foreach (var item in Model)
+    {
+        <form id="@item.Name">
+            <h3><a asp-controller="Data" asp-action="Data">@item.Name</a></h3>
+            <br />
+        </form>
+    }
+</div>

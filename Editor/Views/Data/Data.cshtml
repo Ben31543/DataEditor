@@ -1,0 +1,10 @@
+﻿@model Models.DataModel
+
+<div class="text-center">
+    <h1>Tables of your SQL Database</h1>
+    @foreach (var item in Model.TableData)
+    {
+        <h4>@item</h4>
+        <br />
+    }
+</div>
