@@ -24,7 +24,12 @@ namespace Editor.Controllers
 
         public async Task<IActionResult> Data([Bind("Name")] TableModel tableModel)
         {
-            return View(await _datarepository.GetAllDataAsync(tableModel.Name));
+            var data = new DataModel 
+            { 
+                TableData = await _datarepository.GetAllDataAsync(tableModel.Name) 
+            };
+
+            return View(data);
         }
     }
 }

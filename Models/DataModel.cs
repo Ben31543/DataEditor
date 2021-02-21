@@ -4,6 +4,6 @@ namespace Models
 {
     public class DataModel
     {
-        public List<List<object>> TableData { get; set; }
+        public List<object> TableData { get; set; }
     }
 }

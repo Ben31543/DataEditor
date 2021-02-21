@@ -31,9 +31,9 @@ namespace Repositories.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<DataModel> GetAllDataAsync(string tableName)
+        public async Task<List<object>> GetAllDataAsync(string tableName)
         {
-            var data = new DataModel();
+            var data = new List<object>();
             List<object> items = new List<object>();
             string queryString = $"SELECT * FROM {tableName}";
 
@@ -50,7 +50,7 @@ namespace Repositories.Repositories
                         {
                             var dataColumn =  reader.GetValue(i);
                             items.Add(dataColumn);
-                            data.TableData.Add(items);
+                            data.Add(items);
                         }
                     }
                     reader.Close();
