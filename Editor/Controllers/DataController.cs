@@ -22,11 +22,11 @@ namespace Editor.Controllers
             return View(await _datarepository.GetTablesAsync(_datacontext._connectionString));
         }
 
-        public async Task<IActionResult> Data([Bind("Name")] TableModel tableModel)
+        public async Task<IActionResult> Data(string tableName)
         {
-            var data = new DataModel 
-            { 
-                TableData = await _datarepository.GetAllDataAsync(tableModel.Name) 
+            var data = new DataModel
+            {
+                TableData = await _datarepository.GetAllDataAsync(tableName)
             };
 
             return View(data);

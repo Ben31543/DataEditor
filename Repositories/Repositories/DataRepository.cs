@@ -3,11 +3,9 @@ using Repositories.Data;
 using Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Repositories.Repositories
@@ -31,37 +29,64 @@ namespace Repositories.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<List<object>> GetAllDataAsync(string tableName)
+        public async Task<List<string>> GetAllDataAsync(string tableName)
         {
-            var data = new List<object>();
-            List<object> items = new List<object>();
-            string queryString = $"SELECT * FROM {tableName}";
+            //var data = new Dictionary<string, List<dynamic>>();
+            List<string> items = new List<string>();
+            string queryString = $"SELECT Name FROM {tableName}";
 
             using (SqlConnection connection = new SqlConnection(_context._connectionString))
             {
-                SqlCommand command = new SqlCommand(queryString, connection);
-                try
+                #region variant 1
+                //    SqlCommand command = new SqlCommand(queryString, connection);
+                //    try
+                //    {
+                //        connection.Open();
+                //        SqlDataReader reader = await command.ExecuteReaderAsync();
+                //        while (await reader.ReadAsync())
+                //        {
+                //            for (int i = 0; i < reader.FieldCount; i++)
+                //            {
+                //                var dataColumn = (string)reader.GetValue(i);
+                //                items.Add(dataColumn);
+                //            }
+                //        }
+                //        reader.Close();
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        Debug.WriteLine(e.Message);
+                //    }
+                //}
+                //return items;
+                #endregion
+                connection.Open();
+
+                SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
+
+                DataSet ds = new DataSet();
+                adapter.Fill(ds);
+
+                foreach (DataTable dt in ds.Tables)
                 {
-                    connection.Open();
-                    SqlDataReader reader = await command.ExecuteReaderAsync();
-                    while (await reader.ReadAsync())
+                    Console.WriteLine(dt.TableName); 
+                    foreach (DataColumn column in dt.Columns)
                     {
-                        for (int i = 0; i < reader.FieldCount; i++)
+                        Console.Write("\t{0}", column.ColumnName);
+                    }
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        var cells = row.ItemArray;
+                        foreach (object cell in cells)
                         {
-                            var dataColumn =  reader.GetValue(i);
-                            items.Add(dataColumn);
-                            data.Add(items);
+                            Console.Write("\t{0}", cell);
                         }
                     }
-                    reader.Close();
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e.Message);
                 }
             }
-            return data;
         }
+
 
         public Task<dynamic> GetAsync(int id)
         {
@@ -76,7 +101,7 @@ namespace Repositories.Repositories
         public async Task<List<TableModel>> GetTablesAsync(string dbConnectionString)
         {
             List<TableModel> tables = new List<TableModel>();
-            string queryString = "SELECT TABLE_NAME FROM information_schema.tables";
+            string queryString = "SELECT name FROM sys.tables";
 
             using (SqlConnection connection = new SqlConnection(dbConnectionString))
             {
@@ -87,11 +112,10 @@ namespace Repositories.Repositories
                     SqlDataReader reader = await command.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
-                        for (int i = 0; i < reader.FieldCount; i++)
+                        tables.Add(new TableModel
                         {
-                            var table = new TableModel { Name = reader.GetValue(i) as string };
-                            tables.Add(table);
-                        }
+                            Name = reader.GetValue(0) as string
+                        });
                     }
                     reader.Close();
                 }
