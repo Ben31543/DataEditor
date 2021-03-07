@@ -23,7 +23,8 @@ namespace Editor.Controllers
 
         public async Task<IActionResult> Data(string tableName)
         {
-            var data = await _datarepository.GetTableViewAsync(tableName);
+            //var data = await _datarepository.GetTableViewAsync(tableName);\
+            var data = _datarepository.GetTableData(tableName);
             ViewBag.TableName = tableName;
             return View(data);
         }

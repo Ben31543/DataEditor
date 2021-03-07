@@ -1,32 +1,35 @@
-﻿@model List<Models.DataModel>
+﻿@using System.Data
+@model System.Data.DataSet
 
 <div class="text-center">
-    <h1>@ViewBag.TableName</h1>
+	<h1>@ViewBag.TableName</h1>
 </div>
 
-<table class="table" border="1" aria-live="assertive">
+@if (Model.Tables.Count > 0)
+{
+	<table class="table" border="1" aria-live="assertive">
+		<thead>
+			<tr>
+				@foreach (DataColumn item in Model.Tables[0].Columns)
+				{
+					<th>
+						@item.ColumnName
+					</th>
+				}
+			</tr>
+		</thead>
 
+		<tbody>
+			@foreach (DataRow rowData in Model.Tables[0].Rows)
+			{
+				<tr>
+					@foreach (var data in rowData.ItemArray)
+					{
+						<td>@data</td>
+					}
+				</tr>
+			}
+		</tbody>
 
-    <thead>
-        <tr>
-            @foreach (var item in Model)
-            {
-                <th>
-                    @item.Name
-                </th>
-            }
-        </tr>
-    </thead>
-
-    <tbody>
-        <tr>
-            @foreach (var data in Model)
-            {
-                <td>
-                    @data
-                </td>
-            }
-        </tr>
-    </tbody>
-
-</table>
+	</table>
+}

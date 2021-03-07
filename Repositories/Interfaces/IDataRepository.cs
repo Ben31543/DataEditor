@@ -1,5 +1,6 @@
 ﻿using Models;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace Repositories.Interfaces
@@ -17,5 +18,7 @@ namespace Repositories.Interfaces
         Task DeleteAsync(dynamic model);
 
         Task<dynamic> CreateAsync(dynamic model);
+
+        DataSet GetTableData(string tableName);
     }
 }

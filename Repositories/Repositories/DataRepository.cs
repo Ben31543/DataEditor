@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Repositories.Repositories
@@ -68,6 +69,20 @@ namespace Repositories.Repositories
                 }
             }
             return data.ToList();
+        }
+
+        public DataSet GetTableData(string tableName)
+        {
+            string queryString = $"SELECT * FROM {tableName}";
+
+            using (SqlConnection connection = new SqlConnection(_context._connectionString))
+            {
+                connection.Open();
+                SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
+                DataSet ds = new DataSet();
+                adapter.Fill(ds);
+                return ds;
+            }
         }
 
         public Task<dynamic> GetAsync(int id)
