@@ -8,7 +8,7 @@ namespace Repositories.Interfaces
     {
         Task<List<TableModel>> GetTablesAsync(string dbConnectionString);
 
-        Task<List<string>> GetAllDataAsync(string tableName);
+        Task<List<DataModel>> GetTableViewAsync(string tableName);
 
         Task<dynamic> GetAsync(int id);
 

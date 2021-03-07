@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Models;
 using Repositories.Data;
 using Repositories.Interfaces;
 using System.Threading.Tasks;
@@ -24,11 +23,8 @@ namespace Editor.Controllers
 
         public async Task<IActionResult> Data(string tableName)
         {
-            var data = new DataModel
-            {
-                TableData = await _datarepository.GetAllDataAsync(tableName)
-            };
-
+            var data = await _datarepository.GetTableViewAsync(tableName);
+            ViewBag.TableName = tableName;
             return View(data);
         }
     }

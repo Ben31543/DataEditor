@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Repositories.Data;
 using Repositories.Injections;
 
 namespace Editor
@@ -21,11 +19,7 @@ namespace Editor
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-
-            //services.AddDbContext<DataContext>(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("Context")));
-
-            services.AddRepositoryInjections(Configuration.GetConnectionString("Context2"));
+            services.AddRepositoryInjections(Configuration.GetConnectionString("Context"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -34,10 +28,12 @@ namespace Editor
             {
                 app.UseDeveloperExceptionPage();
             }
+
             else
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
             app.UseStaticFiles();
 
             app.UseRouting();

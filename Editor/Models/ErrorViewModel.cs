@@ -1,5 +1,3 @@
-using System;
-
 namespace Editor.Models
 {
     public class ErrorViewModel

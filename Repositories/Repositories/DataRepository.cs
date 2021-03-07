@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Repositories.Repositories
@@ -29,64 +30,45 @@ namespace Repositories.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<List<string>> GetAllDataAsync(string tableName)
+        public async Task<List<DataModel>> GetTableViewAsync(string tableName)
         {
-            //var data = new Dictionary<string, List<dynamic>>();
-            List<string> items = new List<string>();
-            string queryString = $"SELECT Name FROM {tableName}";
+            var data = new List<DataModel>();
+            string queryString = $"SELECT * FROM {tableName}";
 
             using (SqlConnection connection = new SqlConnection(_context._connectionString))
             {
-                #region variant 1
-                //    SqlCommand command = new SqlCommand(queryString, connection);
-                //    try
-                //    {
-                //        connection.Open();
-                //        SqlDataReader reader = await command.ExecuteReaderAsync();
-                //        while (await reader.ReadAsync())
-                //        {
-                //            for (int i = 0; i < reader.FieldCount; i++)
-                //            {
-                //                var dataColumn = (string)reader.GetValue(i);
-                //                items.Add(dataColumn);
-                //            }
-                //        }
-                //        reader.Close();
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        Debug.WriteLine(e.Message);
-                //    }
-                //}
-                //return items;
-                #endregion
                 connection.Open();
-
                 SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
-
                 DataSet ds = new DataSet();
                 adapter.Fill(ds);
 
-                foreach (DataTable dt in ds.Tables)
-                {
-                    Console.WriteLine(dt.TableName); 
-                    foreach (DataColumn column in dt.Columns)
-                    {
-                        Console.Write("\t{0}", column.ColumnName);
-                    }
+                var values = new List<object>();
 
-                    foreach (DataRow row in dt.Rows)
+                foreach (DataTable table in ds.Tables)
+                {
+                    foreach (DataColumn column in table.Columns)
                     {
-                        var cells = row.ItemArray;
-                        foreach (object cell in cells)
+                        foreach (DataRow row in table.Rows)
                         {
-                            Console.Write("\t{0}", cell);
+                            var cells = row.ItemArray;
+
+                            foreach (object cell in cells)
+                            {
+                                values.Add(cell);
+                            }
+                            data.Add(new DataModel
+                            {
+                                Name = column.ColumnName,
+                                ColumnType = column.DataType,
+                                IsUnique = column.Unique,
+                                Values = values
+                            });
                         }
                     }
                 }
             }
+            return data.ToList();
         }
-
 
         public Task<dynamic> GetAsync(int id)
         {
@@ -124,7 +106,7 @@ namespace Repositories.Repositories
                     Debug.WriteLine(e.Message);
                 }
             }
-            return tables;
+            return tables.ToList();
         }
     }
 }

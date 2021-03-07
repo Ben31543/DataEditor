@@ -1,11 +1,32 @@
-﻿@model Models.DataModel
+﻿@model List<Models.DataModel>
 
 <div class="text-center">
-    <h1>Data</h1>
-    <div>
-        @foreach (var item in Model.TableData)
-        {
-            <h4>@item</h4>
-        }
-    </div>
+    <h1>@ViewBag.TableName</h1>
 </div>
+
+<table class="table" border="1" aria-live="assertive">
+
+
+    <thead>
+        <tr>
+            @foreach (var item in Model)
+            {
+                <th>
+                    @item.Name
+                </th>
+            }
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            @foreach (var data in Model)
+            {
+                <td>
+                    @data
+                </td>
+            }
+        </tr>
+    </tbody>
+
+</table>
