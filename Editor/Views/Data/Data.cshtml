@@ -2,34 +2,52 @@
 @model System.Data.DataSet
 
 <div class="text-center">
-	<h1>@ViewBag.TableName</h1>
+    <h1>@ViewBag.TableName</h1>
 </div>
 
 @if (Model.Tables.Count > 0)
 {
-	<table class="table" border="1" aria-live="assertive">
-		<thead>
-			<tr>
-				@foreach (DataColumn item in Model.Tables[0].Columns)
-				{
-					<th>
-						@item.ColumnName
-					</th>
-				}
-			</tr>
-		</thead>
+    <table class="table" border="1" aria-live="assertive">
+        <thead>
+            <tr>
+                @foreach (DataColumn item in Model.Tables[0].Columns)
+                {
+                    <th>
+                        @item.ColumnName
+                    </th>
+                }
+                <th></th>
+            </tr>
+        </thead>
 
-		<tbody>
-			@foreach (DataRow rowData in Model.Tables[0].Rows)
-			{
-				<tr>
-					@foreach (var data in rowData.ItemArray)
-					{
-						<td>@data</td>
-					}
-				</tr>
-			}
-		</tbody>
+        <tbody>
+            @foreach (DataRow rowData in Model.Tables[0].Rows)
+            {
+                <tr>
+                    @for (int i = 0; i < rowData.ItemArray.Length; i++)
+                    {
+                        <td>
+                            @rowData.ItemArray[i]
+                        </td>
 
-	</table>
+                    }
+                    <td>
+                        <a asp-route-name="@Model.Tables[0].Columns[0].ColumnName" 
+                           asp-route-id="@rowData.ItemArray[0]"
+                           asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
+                           asp-route-tableName="@ViewBag.TableName" 
+                           asp-controller="Data" asp-action="Details">
+                            Details
+                        </a> |
+                        <a asp-route-name="@Model.Tables[0].Columns[0].ColumnName" 
+                           asp-route-id="@rowData.ItemArray[0]"
+                           asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
+                           asp-route-tableName="@ViewBag.TableName"
+                           asp-action="Delete" asp-controller="Data">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
 }

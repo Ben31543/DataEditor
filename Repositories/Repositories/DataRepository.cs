@@ -7,7 +7,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Repositories.Repositories
@@ -26,49 +25,26 @@ namespace Repositories.Repositories
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(dynamic model)
+        public async Task DeleteRowAsync(string tableName, string columnName, string columnType, object value)
         {
-            throw new NotImplementedException();
-        }
+            Type typeOfColumn = Type.GetType(columnType);
+            var columnValue = Convert.ChangeType(value, typeOfColumn) ?? null;
 
-        public async Task<List<DataModel>> GetTableViewAsync(string tableName)
-        {
-            var data = new List<DataModel>();
-            string queryString = $"SELECT * FROM {tableName}";
-
-            using (SqlConnection connection = new SqlConnection(_context._connectionString))
+            if ((columnValue is null) is false)
             {
-                connection.Open();
-                SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
-                DataSet ds = new DataSet();
-                adapter.Fill(ds);
+                string queryString = $"DELETE * " +
+                    $"FROM {tableName} " +
+                    $"WHERE {columnName} = {columnValue}";
 
-                var values = new List<object>();
-
-                foreach (DataTable table in ds.Tables)
+                using (SqlConnection connection = new SqlConnection(_context._connectionString))
                 {
-                    foreach (DataColumn column in table.Columns)
-                    {
-                        foreach (DataRow row in table.Rows)
-                        {
-                            var cells = row.ItemArray;
+                    connection.Open();
 
-                            foreach (object cell in cells)
-                            {
-                                values.Add(cell);
-                            }
-                            data.Add(new DataModel
-                            {
-                                Name = column.ColumnName,
-                                ColumnType = column.DataType,
-                                IsUnique = column.Unique,
-                                Values = values
-                            });
-                        }
-                    }
+                    SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
+                    DataSet dataSet = new DataSet();
+                    //DataRow 
                 }
             }
-            return data.ToList();
         }
 
         public DataSet GetTableData(string tableName)
@@ -85,9 +61,28 @@ namespace Repositories.Repositories
             }
         }
 
-        public Task<dynamic> GetAsync(int id)
+        public DataSet GetRow(string tableName, string columnName, string columnType, object id)
         {
-            throw new NotImplementedException();
+            Type type = Type.GetType(columnType);
+            var value = Convert.ChangeType(id, type);
+
+            if ((value is null) is false)
+            {
+                string queryString = $"SELECT * " +
+                    $"FROM {tableName} " +
+                    $"WHERE {columnName} = {value}";
+
+                using (SqlConnection connection = new SqlConnection(_context._connectionString))
+                {
+                    connection.Open();
+                    SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+
+                    return ds;
+                }
+            }
+            return null;
         }
 
         public async Task UpdateAsync(dynamic model)

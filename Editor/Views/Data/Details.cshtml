@@ -1,0 +1,34 @@
+﻿@using System.Data
+@model System.Data.DataSet
+
+
+<h1>Details</h1>
+
+<table class="table" border="1" aria-live="assertive">
+    <thead>
+        <tr>
+            @foreach (DataColumn item in Model.Tables[0].Columns)
+            {
+                <th>
+                    @item.ColumnName
+                </th>
+            }
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (DataRow rowData in Model.Tables[0].Rows)
+        {
+            <tr>
+                @for (int i = 0; i < rowData.ItemArray.Length; i++)
+                {
+                    <td>
+                        @rowData.ItemArray[i]
+                    </td>
+
+                }
+            </tr>
+        }
+    </tbody>
+
+</table>

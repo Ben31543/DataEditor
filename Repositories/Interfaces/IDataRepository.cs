@@ -1,4 +1,5 @@
 ﻿using Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -9,13 +10,11 @@ namespace Repositories.Interfaces
     {
         Task<List<TableModel>> GetTablesAsync(string dbConnectionString);
 
-        Task<List<DataModel>> GetTableViewAsync(string tableName);
-
-        Task<dynamic> GetAsync(int id);
+        DataSet GetRow(string tableName, string columnName, string columnType, object id);
 
         Task UpdateAsync(dynamic model);
 
-        Task DeleteAsync(dynamic model);
+        Task DeleteRowAsync(string tableName, string columnName, string columnType, object value);
 
         Task<dynamic> CreateAsync(dynamic model);
 

@@ -1,0 +1,46 @@
+﻿@using System.Data
+@model DataSet
+
+
+<h2>Are you sure you want to remove this data from the table?</h2>
+
+<table class="table" border="1" aria-live="assertive">
+    <thead>
+        <tr>
+            @foreach (DataColumn item in Model.Tables[0].Columns)
+            {
+                <th>
+                    @item.ColumnName
+                </th>
+            }
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (DataRow rowData in Model.Tables[0].Rows)
+        {
+            <tr>
+                @for (int i = 0; i < rowData.ItemArray.Length; i++)
+                {
+                    <td>
+                        @rowData.ItemArray[i]
+                    </td>
+
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Tables[0].Columns[0]" />
+    <input type="submit" value="Delete" class="btn btn-danger"
+           asp-route-name="@Model.Tables[0].Columns[0].ColumnName"
+           asp-route-id="@Model.Tables[0].Rows[0].ItemArray[0]"
+           asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
+           asp-route-tableName="@ViewBag.TableName" />
+    |
+    <a asp-action="Data"
+       asp-route-tableName="@ViewBag.TableName">
+        Go Back
+    </a>
+</form>
