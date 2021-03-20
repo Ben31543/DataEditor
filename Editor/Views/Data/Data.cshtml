@@ -7,6 +7,13 @@
 
 @if (Model.Tables.Count > 0)
 {
+    <a asp-action="Create"
+       asp-controller="Data"
+       asp-route-tableName="@ViewBag.TableName"
+       asp-route-Columns="@Model.Tables[0].Columns">
+        Add new row
+    </a>
+
     <table class="table" border="1" aria-live="assertive">
         <thead>
             <tr>
@@ -29,25 +36,38 @@
                         <td>
                             @rowData.ItemArray[i]
                         </td>
-
                     }
                     <td>
-                        <a asp-route-name="@Model.Tables[0].Columns[0].ColumnName" 
-                           asp-route-id="@rowData.ItemArray[0]"
-                           asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
-                           asp-route-tableName="@ViewBag.TableName" 
-                           asp-controller="Data" asp-action="Details">
-                            Details
-                        </a> |
-                        <a asp-route-name="@Model.Tables[0].Columns[0].ColumnName" 
+                        <a asp-route-name="@Model.Tables[0].Columns[0].ColumnName"
                            asp-route-id="@rowData.ItemArray[0]"
                            asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
                            asp-route-tableName="@ViewBag.TableName"
-                           asp-action="Delete" asp-controller="Data">Delete</a>
+                           asp-controller="Data" asp-action="Details">
+                            Details
+                        </a>
+
+                        |
+
+                        <a asp-route-name="@Model.Tables[0].Columns[0].ColumnName"
+                           asp-route-id="@rowData.ItemArray[0]"
+                           asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
+                           asp-route-tableName="@ViewBag.TableName"
+                           asp-action="Delete" asp-controller="Data">
+                            Delete
+                        </a>
+
+                        |
+
+                        <a asp-route-name="@Model.Tables[0].Columns[0].ColumnName"
+                           asp-route-id="@rowData.ItemArray[0]"
+                           asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
+                           asp-route-tableName="@ViewBag.TableName"
+                           asp-action="Edit" asp-controller="Data">
+                            Edit
+                        </a>
                     </td>
                 </tr>
             }
         </tbody>
-
     </table>
 }

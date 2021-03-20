@@ -1,0 +1,62 @@
+﻿@model System.Data.DataSet
+@using System.Data
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="@Model.Tables[0].Columns[0]" />
+            @for (int i = 1; i < Model.Tables[0].Columns.Count; i++)
+            {
+
+                @switch (Model.Tables[ViewBag.TableName].Columns[i].DataType.ToString())
+                {
+                    case "System.Int32":
+                        <div class="form-group">
+                            <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
+                            <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" type="number"/>
+                            <span asp-validation-for="@Model.Tables[0].Columns[i]" class="text-danger"></span>
+                        </div>
+                        break;
+
+                    case "System.String":
+                        <div class="form-group">
+                            <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
+                            <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" type="text"/>
+                            <span class="text-danger"></span>
+                        </div>
+                        break;
+
+                    case "System.Boolean":
+                        <div class="form-group">
+                            <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
+                            <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" type="checkbox"/>
+                            <span class="text-danger"></span>
+                        </div>
+                        break;
+
+                    case "System.DateTime":
+                        <div class="form-group">
+                            <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
+                            <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" type="datetime-local"/>
+                            <span class="text-danger"></span>
+                        </div>
+                        break;
+
+                    default:
+                        <div class="form-group">
+                            <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
+                            <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" />
+                            <span class="text-danger"></span>
+                        </div>
+                        break;
+                }
+            }
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+
+        </form>
+    </div>
+</div>

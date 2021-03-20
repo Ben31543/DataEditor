@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Repositories.Injections;
 
 namespace Repositories.Repositories
 {
@@ -20,9 +21,23 @@ namespace Repositories.Repositories
             _context = context;
         }
 
-        public Task<dynamic> CreateAsync(dynamic model)
+        public DataSet Create(DataModel dataModel, string tableName)
         {
-            throw new NotImplementedException();
+            string queryString = $"INSERT INTO {tableName} " +
+                                 $"({dataModel.Columns.TurnIntoSqlColumns()}) " +
+                                 $"VALUES ({ExtensionMethods.TurnIntoSqlColumnValuePair(dataModel.Columns, dataModel.Values)});";
+
+            using (SqlConnection connection = new SqlConnection(_context.ConnectionString))
+            {
+                connection.Open();
+                SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
+
+                DataSet dataSet = new DataSet();
+                adapter.Fill(dataSet);
+                dataSet.AcceptChanges();
+
+                return dataSet;
+            }
         }
 
         public async Task DeleteRowAsync(string tableName, string columnName, string columnType, object value)
@@ -32,17 +47,18 @@ namespace Repositories.Repositories
 
             if ((columnValue is null) is false)
             {
-                string queryString = $"DELETE * " +
-                    $"FROM {tableName} " +
-                    $"WHERE {columnName} = {columnValue}";
+                string queryString = $"DELETE FROM {tableName} WHERE {columnName} = {columnValue}";
 
-                using (SqlConnection connection = new SqlConnection(_context._connectionString))
+                using (SqlConnection connection = new SqlConnection(_context.ConnectionString))
                 {
                     connection.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
+
                     DataSet dataSet = new DataSet();
-                    //DataRow 
+                    adapter.Fill(dataSet);
+
+                    dataSet.AcceptChanges();
                 }
             }
         }
@@ -51,7 +67,7 @@ namespace Repositories.Repositories
         {
             string queryString = $"SELECT * FROM {tableName}";
 
-            using (SqlConnection connection = new SqlConnection(_context._connectionString))
+            using (SqlConnection connection = new SqlConnection(_context.ConnectionString))
             {
                 connection.Open();
                 SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
@@ -72,7 +88,7 @@ namespace Repositories.Repositories
                     $"FROM {tableName} " +
                     $"WHERE {columnName} = {value}";
 
-                using (SqlConnection connection = new SqlConnection(_context._connectionString))
+                using (SqlConnection connection = new SqlConnection(_context.ConnectionString))
                 {
                     connection.Open();
                     SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
@@ -85,9 +101,20 @@ namespace Repositories.Repositories
             return null;
         }
 
-        public async Task UpdateAsync(dynamic model)
+        public async Task UpdateAsync(string tableName, DataModel dataModel)
         {
+            string queryString = $"UPDATE {tableName} " +
+                                 $"SET {ExtensionMethods.TurnIntoSqlColumnValuePair(dataModel.Columns, dataModel.Values)};";
 
+            using (SqlConnection connection = new SqlConnection(_context.ConnectionString))
+            {
+                connection.Open();
+                DataSet dataSet = new DataSet();
+                SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
+
+                adapter.Fill(dataSet);
+                dataSet.AcceptChanges();
+            }
         }
 
         public async Task<List<TableModel>> GetTablesAsync(string dbConnectionString)

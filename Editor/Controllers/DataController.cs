@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Models;
 using Repositories.Data;
 using Repositories.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace Editor.Controllers
@@ -11,19 +15,21 @@ namespace Editor.Controllers
     {
         private readonly IDataRepository _datarepository;
         private readonly DataContext _datacontext;
+        private readonly ILogger<DataController> _logger;
 
-        public DataController(IDataRepository datarepository, DataContext datacontext)
+        public DataController(IDataRepository datarepository, DataContext datacontext, ILogger<DataController> logger)
         {
             _datarepository = datarepository;
             _datacontext = datacontext;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
         {
-            return View(await _datarepository.GetTablesAsync(_datacontext._connectionString));
+            return View(await _datarepository.GetTablesAsync(_datacontext.ConnectionString));
         }
 
-        public async Task<IActionResult> Data(string tableName)
+        public IActionResult Data(string tableName)
         {
             var data = _datarepository.GetTableData(tableName);
             ViewBag.TableName = tableName;
@@ -59,7 +65,7 @@ namespace Editor.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string tableName, string name, string columnType, int id)
+        public async Task<IActionResult> Edit(string tableName, string name, string columnType, int? id)
         {
             if (id == null)
             {
@@ -70,7 +76,7 @@ namespace Editor.Controllers
             {
                 try
                 {
-                    await _datarepository.UpdateAsync(null);
+                    await _datarepository.UpdateAsync(tableName, new DataModel { });
                 }
 
                 catch (DbUpdateConcurrencyException)
@@ -87,10 +93,30 @@ namespace Editor.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
+
             return View();
         }
 
-        public async Task<IActionResult> Delete(string tableName, string name, string columnType, int id)
+        public async Task<IActionResult> Create(string tableName)
+        {
+            ViewBag.TableName = tableName;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(DataModel dataModel, string tableName, List<object> values)
+        {
+            if (ModelState.IsValid)
+            {
+                _datarepository.Create(dataModel, tableName);
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(dataModel);
+        }
+
+        public async Task<IActionResult> Delete(string tableName, string name, string columnType, int? id)
         {
             ViewBag.TableName = tableName;
 
@@ -98,7 +124,7 @@ namespace Editor.Controllers
             {
                 return NotFound();
             }
-            
+
             var data = _datarepository.GetRow(tableName, name, columnType, id);
 
             if (data == null)
@@ -113,8 +139,9 @@ namespace Editor.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string tableName, string name, string columnType, int id)
         {
+            ViewBag.TableName = tableName;
             await _datarepository.DeleteRowAsync(tableName, name, columnType, id);
-            return RedirectToAction(nameof(Data));
+            return RedirectToAction("Data", "Data", new { tableName = tableName});
         }
     }
 }

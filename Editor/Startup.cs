@@ -1,7 +1,5 @@
-using Editor.Mechanisms.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,15 +47,6 @@ namespace Editor
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
-
-            loggerFactory.AddFile(Path.Combine(Directory.GetCurrentDirectory(), "logger.txt"));
-            var logger = loggerFactory.CreateLogger("FileLogger");
-
-            app.Run(async (context) =>
-            {
-                logger.LogInformation("Processing request {0}", context.Request.Path); 
-                //await context.Response.WriteAsync("Hello World!");
             });
         }
     }

@@ -4,12 +4,12 @@ namespace Repositories.Data
 {
     public class DataContext : DbContext
     {
-        public readonly string _connectionString;
+        public string ConnectionString { get; }
         
         public DataContext(DbContextOptions<DataContext> options, string connectionString)
             : base(options)
         {
-            _connectionString = connectionString;
+            ConnectionString = connectionString;
         }
     }
 }
