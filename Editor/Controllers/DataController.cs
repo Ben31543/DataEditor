@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Primitives;
 
 namespace Editor.Controllers
 {
@@ -43,7 +44,7 @@ namespace Editor.Controllers
                 return NotFound();
             }
 
-            var data = _datarepository.GetRow(tableName, name, columnType, id);
+            var data = _datarepository.GetRow(tableName, name, id);
 
             if (data is null)
             {
@@ -53,48 +54,63 @@ namespace Editor.Controllers
             return View(data);
         }
 
-        public async Task<IActionResult> Edit(object id)
+        public async Task<IActionResult> Edit(string tableName, string pkColumnName, string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            return View();
+            ViewBag.TableName = tableName;
+            DataSet model = _datarepository.GetRow(tableName, pkColumnName, id);
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string tableName, string name, string columnType, int? id)
+        public async Task<IActionResult> EditRecord([FromQuery]string tableName, string columnName, string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+	        DataSet dataSet = _datarepository.GetRow(tableName, columnName, id);
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await _datarepository.UpdateAsync(tableName, new DataModel { });
-                }
+	        //get columns from dataset
+	        Dictionary<string, string> tableValues = new Dictionary<string, string>();
+	        foreach (DataColumn column in dataSet.Tables[0].Columns)
+	        {
+		        string name = column.Caption;
+		        string value = Request.Form[name].ToString();
 
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (_datarepository.GetRow(tableName, name, columnType, id) is null)
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+		        tableValues.Add(name, value);
+	        }
 
-                return RedirectToAction(nameof(Index));
-            }
+	        await _datarepository.UpdateAsync(tableName, tableValues);
+            //if (id == null)
+            //{
+            //    return NotFound();
+            //}
 
-            return View();
+            //if (ModelState.IsValid)
+            //{
+            //    try
+            //    {
+            //        await _datarepository.UpdateAsync(tableName, new DataModel { });
+            //    }
+
+            //    catch (DbUpdateConcurrencyException)
+            //    {
+            //        if (_datarepository.GetRow(tableName, "name", id) is null)
+            //        {
+            //            return NotFound();
+            //        }
+            //        else
+            //        {
+            //            throw;
+            //        }
+            //    }
+
+            //    return RedirectToAction(nameof(Index));
+            //}
+
+            //return View();
         }
 
         public async Task<IActionResult> Create(string tableName)
@@ -125,7 +141,7 @@ namespace Editor.Controllers
                 return NotFound();
             }
 
-            var data = _datarepository.GetRow(tableName, name, columnType, id);
+            var data = _datarepository.GetRow(tableName, name, id);
 
             if (data == null)
             {

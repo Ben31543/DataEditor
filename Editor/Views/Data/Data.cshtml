@@ -38,7 +38,7 @@
                         </td>
                     }
                     <td>
-                        <a asp-route-name="@Model.Tables[0].Columns[0].ColumnName"
+                        <a asp-route-pkColumnName="@Model.Tables[0].Columns[0].ColumnName"
                            asp-route-id="@rowData.ItemArray[0]"
                            asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
                            asp-route-tableName="@ViewBag.TableName"
@@ -58,9 +58,8 @@
 
                         |
 
-                        <a asp-route-name="@Model.Tables[0].Columns[0].ColumnName"
+                        <a asp-route-pkColumnName="@Model.Tables[0].Columns[0].ColumnName"
                            asp-route-id="@rowData.ItemArray[0]"
-                           asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
                            asp-route-tableName="@ViewBag.TableName"
                            asp-action="Edit" asp-controller="Data">
                             Edit

@@ -21,7 +21,7 @@ namespace Editor
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddRepositoryInjections(Configuration.GetConnectionString("Context2"));
+            services.AddRepositoryInjections(Configuration.GetConnectionString("Context"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
@@ -46,7 +46,7 @@ namespace Editor
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}");
             });
         }
     }

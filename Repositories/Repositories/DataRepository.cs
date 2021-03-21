@@ -77,28 +77,26 @@ namespace Repositories.Repositories
             }
         }
 
-        public DataSet GetRow(string tableName, string columnName, string columnType, object id)
+        public DataSet GetRow(string tableName, string pkColumnName, object id)
         {
-            Type type = Type.GetType(columnType);
-            var value = Convert.ChangeType(id, type);
-
-            if ((value is null) is false)
+            if (id == null)
             {
-                string queryString = $"SELECT * " +
-                    $"FROM {tableName} " +
-                    $"WHERE {columnName} = {value}";
-
-                using (SqlConnection connection = new SqlConnection(_context.ConnectionString))
-                {
-                    connection.Open();
-                    SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
-                    DataSet ds = new DataSet();
-                    adapter.Fill(ds);
-
-                    return ds;
-                }
+	            return null;
             }
-            return null;
+
+            string queryString = $"SELECT * " +
+                                 $"FROM {tableName} " +
+                                 $"WHERE {pkColumnName} = {id}";
+
+            using (SqlConnection connection = new SqlConnection(_context.ConnectionString))
+            {
+	            connection.Open();
+	            SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
+	            DataSet ds = new DataSet();
+	            adapter.Fill(ds);
+
+	            return ds;
+            }
         }
 
         public async Task UpdateAsync(string tableName, DataModel dataModel)

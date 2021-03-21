@@ -9,7 +9,7 @@ namespace Repositories.Interfaces
     {
         Task<List<TableModel>> GetTablesAsync(string dbConnectionString);
 
-        DataSet GetRow(string tableName, string columnName, string columnType, object id);
+        DataSet GetRow(string tableName, string columnName, object id);
 
         Task UpdateAsync(string tableName, DataModel dataModel);
 
