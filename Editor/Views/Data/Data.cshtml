@@ -8,9 +8,9 @@
 @if (Model.Tables.Count > 0)
 {
     <a asp-action="Create"
-       asp-controller="Data"
-       asp-route-tableName="@ViewBag.TableName"
-       asp-route-Columns="@Model.Tables[0].Columns">
+       asp-route-pkColumnName="@Model.Tables[0].Columns[0].ColumnName"
+       asp-route-id="@Model.Tables[0].Rows[0].ItemArray[0]"
+       asp-route-tableName="@ViewBag.TableName">
         Add new row
     </a>
 
@@ -40,7 +40,6 @@
                     <td>
                         <a asp-route-pkColumnName="@Model.Tables[0].Columns[0].ColumnName"
                            asp-route-id="@rowData.ItemArray[0]"
-                           asp-route-columnType="@Model.Tables[0].Columns[0].DataType"
                            asp-route-tableName="@ViewBag.TableName"
                            asp-controller="Data" asp-action="Details">
                             Details

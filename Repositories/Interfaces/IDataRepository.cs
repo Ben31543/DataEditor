@@ -11,11 +11,11 @@ namespace Repositories.Interfaces
 
         DataSet GetRow(string tableName, string columnName, object id);
 
-        Task UpdateAsync(string tableName, DataModel dataModel);
+        Task UpdateAsync(string tableName, string pkColumnName, object id, Dictionary<string, string> tableValues);
 
         Task DeleteRowAsync(string tableName, string columnName, string columnType, object value);
 
-        DataSet Create(DataModel dataModel, string tableName);
+        Task<DataSet> CreateAsync(Dictionary<string, string> values, string tableName);
 
         DataSet GetTableData(string tableName);
     }

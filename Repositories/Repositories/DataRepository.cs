@@ -21,11 +21,11 @@ namespace Repositories.Repositories
             _context = context;
         }
 
-        public DataSet Create(DataModel dataModel, string tableName)
+        public async Task<DataSet> CreateAsync(Dictionary<string, string> values, string tableName)
         {
             string queryString = $"INSERT INTO {tableName} " +
-                                 $"({dataModel.Columns.TurnIntoSqlColumns()}) " +
-                                 $"VALUES ({ExtensionMethods.TurnIntoSqlColumnValuePair(dataModel.Columns, dataModel.Values)});";
+                                 $"({values.TurnIntoSqlColumns()}) " +
+                                 $"VALUES ({values.TurnIntoSqlValuesRow()});";
 
             using (SqlConnection connection = new SqlConnection(_context.ConnectionString))
             {
@@ -84,7 +84,7 @@ namespace Repositories.Repositories
 	            return null;
             }
 
-            string queryString = $"SELECT * " +
+            string queryString = "SELECT * " +
                                  $"FROM {tableName} " +
                                  $"WHERE {pkColumnName} = {id}";
 
@@ -99,10 +99,11 @@ namespace Repositories.Repositories
             }
         }
 
-        public async Task UpdateAsync(string tableName, DataModel dataModel)
+        public async Task UpdateAsync(string tableName, string pkColumnName, object id, Dictionary<string, string> tableValues)
         {
             string queryString = $"UPDATE {tableName} " +
-                                 $"SET {ExtensionMethods.TurnIntoSqlColumnValuePair(dataModel.Columns, dataModel.Values)};";
+                                 $"SET {tableValues.TurnIntoSqlColumnValuePair()}" +
+                                 $"WHERE {pkColumnName} = {id};";
 
             using (SqlConnection connection = new SqlConnection(_context.ConnectionString))
             {

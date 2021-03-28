@@ -1,106 +1,60 @@
-﻿@model Models.DataModel
+﻿@model Dictionary<DataColumn, string>
 @using System.Data
 
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Create" asp-controller="Data">
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="@Model.Columns[0]" />
-            @*@for (int i = 1; i < Model.Tables[0].Columns.Count; i++)
-        {
+            @*<input type="hidden" />*@
 
-            @switch (Model.Tables[ViewBag.TableName].Columns[i].DataType.ToString())
+            @foreach (var item in Model)
             {
-                case "System.Int32":
-                    <div class="form-group">
-                        <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
-                        <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" type="number" />
-                        <span asp-validation-for="@Model.Tables[0].Columns[i]" class="text-danger"></span>
-                    </div>
-                    break;
-
-                case "System.String":
-                    <div class="form-group">
-                        <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
-                        <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" type="text" />
-                        <span class="text-danger"></span>
-                    </div>
-                    break;
-
-                case "System.Boolean":
-                    <div class="form-group">
-                        <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
-                        <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" type="checkbox" />
-                        <span class="text-danger"></span>
-                    </div>
-                    break;
-
-                case "System.DateTime":
-                    <div class="form-group">
-                        <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
-                        <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" type="datetime-local" />
-                        <span class="text-danger"></span>
-                    </div>
-                    break;
-
-                default:
-                    <div class="form-group">
-                        <label asp-for="@Model.Tables[0].Columns[i]" class="control-label"></label>
-                        <input asp-for="@Model.Tables[0].Columns[i]" class="form-control" />
-                        <span class="text-danger"></span>
-                    </div>
-                    break;
-            }
-        }*@
-
-            @for (int i = 0; i < Model.Columns.Count; i++)
-            {
-                @switch (Model.Columns[i].GetType().FullName)
+                switch (item.Key.DataType.ToString())
                 {
                     case "System.Int32":
                         <div class="form-group">
-                            <label asp-for="@Model.Columns[i]" class="control-label"></label>
-                            <input asp-for="@Model.Columns[i]" class="form-control" type="number" />
-                            <span asp-validation-for="@Model.Columns[i]" class="text-danger"></span>
+                            @Html.Label($"{item.Key.ColumnName}", $"{item.Key.ColumnName}")
+                            <input name="@item.Key.ColumnName" class="form-control" type="number" />
+                            <span asp-validation-for="@item.Value" class="text-danger"></span>
                         </div>
                         break;
 
                     case "System.String":
                         <div class="form-group">
-                            <label asp-for="@Model.Columns[i]" class="control-label"></label>
-                            <input asp-for="@Model.Columns[i]" class="form-control" type="text" />
-                            <span class="text-danger"></span>
+                            @Html.Label($"{item.Key.ColumnName}", $"{item.Key.ColumnName}")
+                            <input name="@item.Key.ColumnName" class="form-control" type="text" />
+                            <span asp-validation-for="@item.Value" class="text-danger"></span>
                         </div>
                         break;
 
                     case "System.Boolean":
                         <div class="form-group">
-                            <label asp-for="@Model.Columns[i]" class="control-label"></label>
-                            <input asp-for="@Model.Columns[i]" class="form-control" type="checkbox" />
-                            <span class="text-danger"></span>
+                            @Html.Label($"{item.Key.ColumnName}", $"{item.Key.ColumnName}")
+                            <input name="@item.Key.ColumnName" class="form-control" type="checkbox" />
+                            <span asp-validation-for="@item.Value" class="text-danger"></span>
                         </div>
                         break;
 
                     case "System.DateTime":
                         <div class="form-group">
-                            <label asp-for="@Model.Columns[i]" class="control-label"></label>
-                            <input asp-for="@Model.Columns[i]" class="form-control" type="datetime-local" />
-                            <span class="text-danger"></span>
+                            @Html.Label($"{item.Key.ColumnName}", $"{item.Key.ColumnName}")
+                            <input name="@item.Key.ColumnName" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="@item.Value" class="text-danger"></span>
                         </div>
                         break;
 
                     default:
                         <div class="form-group">
-                            <label asp-for="@Model.Columns[i]" class="control-label"></label>
-                            <input asp-for="@Model.Columns[i]" class="form-control" />
-                            <span class="text-danger"></span>
+                            @Html.Label($"{item.Key.ColumnName}", $"{item.Key.ColumnName}")
+                            <input name="@item.Key.ColumnName" class="form-control" />
+                            <span asp-validation-for="@item.Value" class="text-danger"></span>
                         </div>
                         break;
                 }
             }
-
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Add" class="btn btn-primary" asp-route-tableValues="@Model" asp-route-tableName="@ViewBag.TableName" />
             </div>
 
         </form>

@@ -18,79 +18,61 @@ namespace Repositories.Injections
             services.AddTransient<IDataRepository, DataRepository>();
         }
 
-        public static string TurnIntoSqlColumns(this List<string> columns)
+        public static string TurnIntoSqlColumns(this Dictionary<string, string> values)
         {
             StringBuilder returnableResult = new StringBuilder();
+            int index = 0;
 
-            for (int i = 1; i < columns.Count; i++)
+            foreach (var item in values)
             {
-                string res = columns[i];
-
-                if (i == columns.Count - 1)
+                if (index == values.Values.Count - 1)
                 {
-                    returnableResult.Append(res);
+                    returnableResult.Append($"{item.Key}");
                     break;
                 }
 
-                returnableResult.Append(res + ", ");
+                returnableResult.Append($"{item.Key}, ");
+                index++;
             }
+
             return returnableResult.ToString();
         }
 
-        public static string TurnIntoSqlValuesRow(List<object> values)
+        public static string TurnIntoSqlValuesRow(this Dictionary<string, string> values)
         {
             StringBuilder returnableResult = new StringBuilder();
+            int index = 0;
 
-            for (int i = 1; i < values.Count; i++)
+            foreach (var item in values)
             {
-                #region Other variant
-                //Type dataType = values[i].GetType();
-                //string res;
-
-                //switch (dataType.ToString())
-                //{
-                //    case "System.Int32":
-                //        res = values[i].ToString();
-                //        break;
-                //    case "System.String":
-                //        res = $"'{values[i]}'";
-                //        break;
-                //    case "System.Char":
-                //        res = $"'{values[i]}'";
-                //        break;
-                //    case "System.DateTime":
-                //        res = $"'{values[i]}'";
-                //        break;
-                //    default:
-                //        res = values[i].ToString();
-                //        break;
-                //}
-                #endregion
-
-                if (i == values.Count - 1)
+                if (index == values.Values.Count - 1)
                 {
-                    returnableResult.Append($"'{values[i]}'");
+                    returnableResult.Append($"{item.Value}");
                     break;
                 }
 
-                returnableResult.Append($"'{values[i]}'" + ", ");
+                returnableResult.Append($"{item.Value}, ");
+                index++;
             }
+
             return returnableResult.ToString();
         }
 
-        public static string TurnIntoSqlColumnValuePair(List<string> columns, List<object> values)
+        public static string TurnIntoSqlColumnValuePair(this Dictionary<string, string> tableValues)
         {
             StringBuilder returnableResult = new StringBuilder();
+            int index = 0;
 
-            for (int i = 0; i < columns.Count; i++)
+            foreach (var item in tableValues)
             {
-                if (i == columns.Count - 1 || i == values.Count - 1)
+                if (index == tableValues.Count - 1)
                 {
-                    returnableResult.Append($"{columns[i]} = '{values[i]}';");
+                    returnableResult.Append($"{item.Key} = '{item.Value}'");
                     break;
                 }
 
-                returnableResult.Append($"{columns[i]} = '{values[i]}', ");
+                returnableResult.Append($"{item.Key} = '{item.Value}', ");
+                index++;
             }
 
             return returnableResult.ToString();

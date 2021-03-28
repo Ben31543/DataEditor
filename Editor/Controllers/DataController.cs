@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Models;
 using Repositories.Data;
 using Repositories.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Primitives;
 
 namespace Editor.Controllers
 {
@@ -25,6 +21,8 @@ namespace Editor.Controllers
             _logger = logger;
         }
 
+        #region Data from Db and tables
+
         public async Task<IActionResult> Index()
         {
             return View(await _datarepository.GetTablesAsync(_datacontext.ConnectionString));
@@ -37,14 +35,14 @@ namespace Editor.Controllers
             return View(data);
         }
 
-        public async Task<IActionResult> Details(string tableName, string name, string columnType, int? id)
+        public async Task<IActionResult> Details(string tableName, string pkColumnName, string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var data = _datarepository.GetRow(tableName, name, id);
+            var data = _datarepository.GetRow(tableName, pkColumnName, id);
 
             if (data is null)
             {
@@ -54,6 +52,9 @@ namespace Editor.Controllers
             return View(data);
         }
 
+        #endregion
+
+        #region Edit GET/POST
         public async Task<IActionResult> Edit(string tableName, string pkColumnName, string id)
         {
             if (id == null)
@@ -63,75 +64,89 @@ namespace Editor.Controllers
 
             ViewBag.TableName = tableName;
             DataSet model = _datarepository.GetRow(tableName, pkColumnName, id);
+
             return View(model);
         }
 
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditRecord([FromQuery]string tableName, string columnName, string id)
+        public async Task<IActionResult> EditRecord([FromQuery] string tableName, string pkColumnName, string id)
         {
-	        DataSet dataSet = _datarepository.GetRow(tableName, columnName, id);
+            DataSet dataSet = _datarepository.GetRow(tableName, pkColumnName, id);
 
-	        //get columns from dataset
-	        Dictionary<string, string> tableValues = new Dictionary<string, string>();
-	        foreach (DataColumn column in dataSet.Tables[0].Columns)
-	        {
-		        string name = column.Caption;
-		        string value = Request.Form[name].ToString();
+            Dictionary<string, string> tableValues = new Dictionary<string, string>();
 
-		        tableValues.Add(name, value);
-	        }
-
-	        await _datarepository.UpdateAsync(tableName, tableValues);
-            //if (id == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //if (ModelState.IsValid)
-            //{
-            //    try
-            //    {
-            //        await _datarepository.UpdateAsync(tableName, new DataModel { });
-            //    }
-
-            //    catch (DbUpdateConcurrencyException)
-            //    {
-            //        if (_datarepository.GetRow(tableName, "name", id) is null)
-            //        {
-            //            return NotFound();
-            //        }
-            //        else
-            //        {
-            //            throw;
-            //        }
-            //    }
-
-            //    return RedirectToAction(nameof(Index));
-            //}
-
-            //return View();
-        }
-
-        public async Task<IActionResult> Create(string tableName)
-        {
-            ViewBag.TableName = tableName;
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(DataModel dataModel, string tableName, List<object> values)
-        {
-            if (ModelState.IsValid)
+            for (int i = 1; i < dataSet.Tables[0].Columns.Count; i++)
             {
-                _datarepository.Create(dataModel, tableName);
-                return RedirectToAction(nameof(Index));
+                string name = dataSet.Tables[0].Columns[i].ColumnName;
+                string value = Request.Form[name].ToString();
+
+                tableValues.Add(name, value);
             }
 
-            return View(dataModel);
+            await _datarepository.UpdateAsync(tableName, pkColumnName, id, tableValues);
+
+            return RedirectToAction("Data", "Data", new { tableName = tableName });
+        }
+        #endregion
+
+        public async Task<IActionResult> Create(string tableName, string pkColumnName, string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.TableName = tableName;
+            DataSet dataSet = _datarepository.GetRow(tableName, pkColumnName, id);
+            Dictionary<DataColumn, string> tableValues = new Dictionary<DataColumn, string>();
+
+            for (int i = 1; i < dataSet.Tables[0].Columns.Count; i++)
+            {
+                DataColumn column = dataSet.Tables[0].Columns[i];
+                string value = "";
+
+                tableValues.Add(column, value);
+            }
+
+            return View(tableValues);
         }
 
+        [HttpPost, ActionName("Create")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Dictionary<DataColumn, string> tableValues, string tableName)
+        {
+            Dictionary<string, string> values = new Dictionary<string, string>();
+            int index = 0;
+            foreach (var item in tableValues)
+            {
+                if (index == 0)
+                {
+                    continue;
+                }
+
+                if (index == tableValues.Count - 1)
+                {
+                    break;
+                }
+
+                string name = item.Key.ColumnName;
+                string value = Request.Form[name].ToString();
+
+                values.Add(name, value);
+
+                index++;
+            }
+
+            if (ModelState.IsValid)
+            {
+                await _datarepository.CreateAsync(values, tableName);
+            }
+
+            return RedirectToAction("Data", "Data", new { tableName = tableName });
+        }
+
+        #region Delete GET/POST
         public async Task<IActionResult> Delete(string tableName, string name, string columnType, int? id)
         {
             ViewBag.TableName = tableName;
@@ -157,7 +172,8 @@ namespace Editor.Controllers
         {
             ViewBag.TableName = tableName;
             await _datarepository.DeleteRowAsync(tableName, name, columnType, id);
-            return RedirectToAction("Data", "Data", new { tableName = tableName});
+            return RedirectToAction("Data", "Data", new { tableName = tableName });
         }
+        #endregion
     }
 }
