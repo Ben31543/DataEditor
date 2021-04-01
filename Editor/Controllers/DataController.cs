@@ -72,6 +72,8 @@ namespace Editor.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditRecord([FromQuery] string tableName, string pkColumnName, string id)
         {
+	        id ??= "-1";
+
             DataSet dataSet = _datarepository.GetRow(tableName, pkColumnName, id);
 
             Dictionary<string, string> tableValues = new Dictionary<string, string>();
@@ -84,7 +86,14 @@ namespace Editor.Controllers
                 tableValues.Add(name, value);
             }
 
-            await _datarepository.UpdateAsync(tableName, pkColumnName, id, tableValues);
+            if (int.TryParse(id, out int idInt) && idInt == -1)
+            {
+	            await _datarepository.CreateAsync(tableValues, tableName);
+            }
+            else
+            {
+	            await _datarepository.UpdateAsync(tableName, pkColumnName, id, tableValues);
+            }
 
             return RedirectToAction("Data", "Data", new { tableName = tableName });
         }

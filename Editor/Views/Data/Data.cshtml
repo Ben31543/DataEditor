@@ -7,12 +7,13 @@
 
 @if (Model.Tables.Count > 0)
 {
-    <a asp-action="Create"
-       asp-route-pkColumnName="@Model.Tables[0].Columns[0].ColumnName"
-       asp-route-id="@Model.Tables[0].Rows[0].ItemArray[0]"
-       asp-route-tableName="@ViewBag.TableName">
-        Add new row
-    </a>
+
+<a asp-route-pkColumnName="@Model.Tables[0].Columns[0].ColumnName"
+   asp-route-id="-1"
+   asp-route-tableName="@ViewBag.TableName"
+   asp-action="Edit" asp-controller="Data">
+	Create new record
+</a>
 
     <table class="table" border="1" aria-live="assertive">
         <thead>
